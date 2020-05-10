@@ -1,5 +1,5 @@
-# cs5272_project
-An embedded software design project.
+# Embedded Software Design Project
+An embedded software design project for my masters.
 
 ## Introduction
 The goal of this project is to build an FPS-Aware Governor that runs on userspace. The objective of
