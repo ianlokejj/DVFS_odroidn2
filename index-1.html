@@ -1,0 +1,8 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Unknown </title></head><body>
+<h1 id="cs5272_project">cs5272_project</h1>
+<p>An embedded software design project. The project was based on the embedded hardware platform ODROID-N2 which is capable of heterogeneous processing. It consists of 4 ARM A73 cores, 2 ARM A53 cores and one ARM Mali-G52 GPU. The runtime management strategy is implemented as a userspace governor. It introduces a power-performance tradeoff strategy to a neural network object detection application running on the hardware platform.</p>
+<p>The userspace governor capable of:
+1. adjusting the DVFS of CPU clusters to ensure power efficiecny
+2. ensuring that the the QoS (in terms of FPS) of an machine learning objection detection application is maintained.</p>
+<p><img alt="Architecture" src="/images/architecture.png" /></p>
+</body></html>
