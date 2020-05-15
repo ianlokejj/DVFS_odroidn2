@@ -30,3 +30,8 @@ The Main FSM adjusts the system configuration (i.e. frequency settings, number o
 ## Overall Design
 
 ![Design](/images/cluster_migration.png)
+
+## Set up the project
+1. Download the Ubuntu MATE image from https://dn.odroid.com/S922X/ODROID-N2/Ubuntu/. The project was developed and tested on `ubuntu-18.04.4-4.9-mate-odroid-n2-20200224.img.xz`
+2. Extract and write the image onto an SD Card. You can use Ubuntu Startup Disk Creator.
+3.
