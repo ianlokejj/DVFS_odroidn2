@@ -32,6 +32,9 @@ The Main FSM adjusts the system configuration (i.e. frequency settings, number o
 ![Design](/images/cluster_migration.png)
 
 ## Set up the project
-1. Download the Ubuntu MATE image from https://dn.odroid.com/S922X/ODROID-N2/Ubuntu/. The project was developed and tested on `ubuntu-18.04.4-4.9-mate-odroid-n2-20200224.img.xz`
+1. Download the Odroid N2 Ubuntu MATE image from https://dn.odroid.com/S922X/ODROID-N2/Ubuntu/. The project was developed and tested on `ubuntu-18.04.4-4.9-mate-odroid-n2-20200224.img.xz`
 2. Extract and write the image onto an SD Card. You can use Ubuntu Startup Disk Creator.
-3.
+3. Connect the board to your local network and `ssh` into the N2 with the `-XY` command i.e `ssh -XY odroid@IP_ADDRESS`. The default password is `odroid`.
+4. Update and upgrade the board by running `sudo apt update && sudo apt upgrade`.
+5. Install [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html).  on the board. *This project was developed on OpenCV 4.3.0. You do not need to install the optional packages.*
+6. Clone this repository onto the board. `git clone https://github.com/ianloke/DVFS_odroidn2.git`
