@@ -36,8 +36,7 @@ The Main FSM adjusts the system configuration (i.e. frequency settings, number o
 2. Extract and write the image onto an SD Card. You can use Ubuntu Startup Disk Creator. *Make sure the size of the SD Card is at least 16gb*
 3. Connect the board to your local network and `ssh` into the N2 with the `-XY` command i.e `ssh -XY odroid@IP_ADDRESS`. The default password is `odroid`.
 4. Update and upgrade the board by running `sudo apt update`.
-5. Install [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html).  on the board. *This project was developed on OpenCV 4.0.1. You do not need to install the optional packages.*
-  - Alternatively, you can run the following commands
+5. Install OpenCV on the N2. *This project was developed on OpenCV 4.0.1. You do not need to install the optional packages.*
   ```
     sudo apt-get install build-essential
     sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
@@ -50,4 +49,44 @@ The Main FSM adjusts the system configuration (i.e. frequency settings, number o
     make -j2
     sudo make install
   ```
-6. Clone this repository onto the board. `git clone https://github.com/ianloke/DVFS_odroidn2.git`
+6. Clone and build this repository onto the board.
+```
+git clone https://github.com/ianloke/DVFS_odroidn2.git
+cd resource/
+cmake .
+make
+```
+7. Ensure that the built is successful before proceeding to run the application.
+```
+Scanning dependencies of target DisplayImage
+[ 33%] Building CXX object CMakeFiles/DisplayImage.dir/types.cpp.o
+[ 66%] Building CXX object CMakeFiles/DisplayImage.dir/object_detection.cpp.o
+[100%] Linking CXX executable DisplayImage
+[100%] Built target DisplayImage
+```
+
+## Run the application
+- With a webcam connected via USB to to the N2, open a terminal and run the project from the `resource` folder `sudo ./run.sh`
+- From the terminal, select the mode of operation.
+  - Option 1: Set a target FPS for the Governor to work towards
+  - Option 2: Manually set the CPU Affinity
+  - Option 3: Manually set the CPU frequency
+  - Option 4: Display the application status
+  - Option 5: End the application
+
+```
+1. Set target FPS
+2. Set affinity
+3. Set scaling frequency
+4. Print application information
+5. Exit
+```
+
+## Results
+- Below are some results captured whilst the governor was running at different target FPS. The actual FPS of the application is displayed on the top left section of the display window.
+
+### Target FPS = 13
+![Result 1](/images/results_1.png)
+
+### Target FPS = 4
+![Result 2](/images/results_2.png)
