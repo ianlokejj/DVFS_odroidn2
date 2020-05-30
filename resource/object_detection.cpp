@@ -2,6 +2,7 @@
 #include <sstream>
 #include <thread>
 #include <vector>
+#include <chrono>
 
 #include <opencv2/dnn.hpp>
 #include <opencv2/imgproc.hpp>
@@ -10,7 +11,6 @@
 #include "common.hpp"
 #include "governor.hpp"
 #include "console.hpp"
-#include "logger.hpp"
 
 std::string keys =
     "{ help  h     | | Print help message. }"
@@ -31,8 +31,7 @@ std::string keys =
                          "0: CPU target (by default), "
                          "1: OpenCL, "
                          "2: OpenCL fp16 (half-float precision), "
-                         "3: VPU }"
-    "{ log         | 500 | Logging interval. }";
+                         "3: VPU }";
 
 
 using namespace cv;
@@ -117,18 +116,15 @@ int main(int argc, char** argv)
     cap >> frame;
 
     Governor governor;
-    //Logger log;
-    //log.start(&governor, parser.get<unsigned int>("log"));
 
     // Create another thread for input/output
     bool io_ended = false;
-    std::thread io_thread(Console(), std::ref(governor), std::vector<int>(), [&io_ended]()
+    std::thread io_thread(Console(), std::ref(governor), [&io_ended]()
     {
         io_ended = true;
     });
 
     auto last_time = std::chrono::system_clock::now();
-    unsigned int frame_count = 0;
     while (!io_ended)
     {
         waitKey(1);
@@ -162,28 +158,23 @@ int main(int argc, char** argv)
         double freq = getTickFrequency() / 1000;
         double t = net.getPerfProfile(layersTimes) / freq;
         std::string label = format("Inference time: %.2f ms", t);
-        putText(frame, label, Point(0, 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 255, 0));
+        putText(frame, label, Point(0, 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0));
 
-        frame_count++;
+        // Calculate FPS
         auto now = std::chrono::system_clock::now();
         std::chrono::duration<double,std::milli> timeChange = (now - last_time);
-
-        if(timeChange.count() >= 1000)
-        {
-            // Calculate FPS
-            governor.worked(frame_count, timeChange.count());
-            frame_count = 0;
-            last_time = now;
-        }
+        governor.worked(1, timeChange.count());
+        last_time = now;
 
         // Put FPS
-        putText(frame, format("FPS: %.2f", governor.get_cur_fps()), Point(0, 70), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 0));
+        putText(frame, format("FPS: %.2f", governor.get_cur_fps()), Point(0, 70), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 0, 0));
 
         imshow(kWinName, frame);
     }
 
+    governor.stop();
     io_thread.join();
-    //log.stop();
+
 
     return 0;
 }

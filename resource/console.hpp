@@ -8,18 +8,17 @@
 #include <sys/syscall.h>
 
 #include "types.h"
-#include "logger.hpp"
 
 #define gettid() syscall(SYS_gettid)
 
 class Console
 {
 public:
-    void operator()(Governor& governor, const std::vector<pid_t>& pids_exclude, std::function<void()> callback)
+    void operator()(Governor& governor, std::function<void()> callback)
     {
         // Capture all opencv thread ids
         std::vector<int> pids;
-        get_opencv_pids(pids, pids_exclude);
+        get_opencv_pids(pids);
 
         std::vector<std::string> freqs;
         freqs.push_back(ScalingFrequency::_100000KHz);
@@ -34,11 +33,17 @@ public:
         freqs.push_back(ScalingFrequency::_1704000KHz);
         freqs.push_back("");
 
+        // Set to run on small cores
+        governor.run_on_cores(CPU::SmallCores, 0);
+
+        // Start the governor
+        governor.start(pids);
+
         const std::string menu = "1. Set target FPS\n"
                                  "2. Set affinity\n"
                                  "3. Set scaling frequency\n"
                                  "4. Print application information\n"
-                                 "5. Exist\n"
+                                 "5. Exit\n"
                                  "Input: ";
 
         while (1)
@@ -56,15 +61,15 @@ public:
                 int i = std::stoi(input);
                 switch (i)
                 {
-                case 1:{
+                case 1:
+                {
                     std::cout << "Enter target fps: ";
                     std::cin >> input;
 
-                    int fps = std::stoi(input);
-                    int fps_result = governor.set_target_fps(fps, pids);
-                    std::cout << "Target fps: " << fps_result << std::endl;
+                    double fps = std::stod(input);
+                    governor.set_target_fps(fps);
                     break;
-                    }
+                }
                 case 2:
                     std::cout << "Enter \"big\", \"small\", \"all\" or mask(LSB-MSB): ";
                     std::cin >> input;
@@ -100,7 +105,6 @@ public:
                             break;
                         }
                     }
-                    //log.notify_dirty();
 
                     std::cout << "Application set to run on: " << governor.runs_on(pids[0]) << std::endl;
                     break;
@@ -130,7 +134,6 @@ public:
                         default:
                             print_error_option();
                         }
-                        //log.notify_dirty();
                     }
                     catch(std::invalid_argument)
                     {
@@ -166,7 +169,7 @@ private:
         std::cout << "Please enter a correct option." << std::endl;
     }
 
-    void get_opencv_pids(std::vector<int>& pids, const std::vector<int>& pids_exclude)
+    void get_opencv_pids(std::vector<int>& pids)
     {
         system("ps -eL | grep DisplayImage > opencv_pids");
 

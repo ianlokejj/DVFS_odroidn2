@@ -47,6 +47,9 @@ public:
     Core operator| (const Core& that);
     Core operator|= (const int cpu);
     bool operator== (const Core& that);
+    void add_core(const int cpu);
+    void less_core(const int cpu);
+    int get_num_cores();
     operator cpu_set_t() const;
     operator std::string() const;
 
@@ -58,6 +61,8 @@ private:
 namespace CPU
 {
     extern const int num_cpu;
+    extern const std::pair<int, int> s_range;
+    extern const std::pair<int, int> b_range;
     extern Core Core0, Core1, Core2, Core3, Core4, Core5, SmallCores, BigCores, AllCores;
 }
 

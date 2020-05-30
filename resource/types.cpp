@@ -1,5 +1,6 @@
 #include <sched.h>
 #include <string>
+#include <iostream>
 
 #include "types.h"
 
@@ -43,7 +44,11 @@ Core::Core()
 
 Core::Core(int mask)
 {
-    CPU_SET(mask, &this->mask);
+    CPU_ZERO(&this->mask);
+    if(mask != -1)
+    {
+        CPU_SET(mask, &this->mask);
+    }
 }
 
 Core::Core(cpu_set_t mask)
@@ -54,6 +59,7 @@ Core::Core(cpu_set_t mask)
 Core Core::operator& (const Core& that)
 {
     cpu_set_t new_mask;
+    CPU_ZERO(&new_mask);
     CPU_AND(&new_mask, &this->mask, &that.mask);
     return Core(new_mask);
 }
@@ -61,6 +67,7 @@ Core Core::operator& (const Core& that)
 Core Core::operator| (const Core& that)
 {
     cpu_set_t new_mask;
+    CPU_ZERO(&new_mask);
     CPU_OR(&new_mask, &this->mask, &that.mask);
     return Core(new_mask);
 }
@@ -73,6 +80,28 @@ Core Core::operator|= (const int cpu)
 bool Core::operator== (const Core& that)
 {
     return CPU_EQUAL(&this->mask, &that.mask);
+}
+
+void Core::add_core(const int cpu)
+{
+    CPU_SET(cpu, &mask);
+}
+
+void Core::less_core(const int cpu)
+{
+    CPU_CLR(cpu, &mask);
+}
+
+int Core::get_num_cores()
+{
+    int cores = 0;
+    for(int i = 0; i < CPU::num_cpu; i++)
+    {
+        if(CPU_ISSET(i, &mask))
+            cores++;
+    }
+
+    return cores;
 }
 
 Core::operator cpu_set_t() const
@@ -98,6 +127,8 @@ namespace CPU
 {
 // Number of CPUs on this system
 const int num_cpu = 6;
+const std::pair<int, int> s_range(0, 1);
+const std::pair<int, int> b_range(2, 5);
 
 // Small cores
 Core Core0(0);
